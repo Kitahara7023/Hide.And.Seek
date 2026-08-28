@@ -13,6 +13,9 @@ public class GridManager : MonoBehaviour
     [Header("ƒpƒlƒ‹ŠÔŠu")]
     public float spacing = 1.1f;
 
+    [Header("”š’e‚Ì”")]
+    public int bombCount = 5;
+
     private Panel[,] panels;
     private Camera mainCamera;
 
@@ -23,23 +26,20 @@ public class GridManager : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("‡@ Start");
-
         // ƒpƒlƒ‹”z—ñ‚ğì¬
         panels = new Panel[width, height];
 
         // ”Õ–Ê¶¬
-        Debug.Log("‡A CreateGrid");
         CreateGrid();
 
         // ¬l‚ğ1‘Ì¶¬
-        Debug.Log("‡B SpawnDwarf");
         DwarfManager.Instance.SpawnDwarf(DwarfType.Stay);
 
-        Debug.Log("‡C SpawnBomb");
-        BombManager.Instance.SpawnBomb();
-
-        Debug.Log("‡D End");
+        // ”š’e‚ğw’è‚µ‚½”‚¾‚¯”z’u
+        for (int i = 0; i < bombCount; i++)
+        {
+            BombManager.Instance.SpawnBomb();
+        }
     }
 
     void Update()
