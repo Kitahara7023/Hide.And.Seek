@@ -28,6 +28,11 @@ public class Panel : MonoBehaviour
 
     public void BreakPanel()
     {
+        BreakPanel(true);
+    }
+
+    public void BreakPanel(bool useTurn)
+    {
         // すでに壊れているなら何もしない
         if (isBroken)
             return;
@@ -38,12 +43,14 @@ public class Panel : MonoBehaviour
 
         Debug.Log($"Break ({x},{y})");
 
-        // ターンを消費
-        GameManager.Instance.UseTurn();
+        // 直接クリックされた場合だけターンを減らす
+        if (useTurn)
+        {
+            GameManager.Instance.UseTurn();
+        }
 
-        
         // 小人
-        
+
         if (dwarf != null)
         {
             Debug.Log($"小人発見！ Panel ({x},{y})");
@@ -59,9 +66,9 @@ public class Panel : MonoBehaviour
             dwarf.Found();
         }
 
-       
+
         // 爆弾
-       
+
         if (hasBomb)
         {
             Debug.Log($"爆弾発見！ Panel ({x},{y})");
@@ -73,9 +80,9 @@ public class Panel : MonoBehaviour
             BombManager.Instance.Explode(this);
         }
 
-      
+
         // パネルを消す
-      
+
         spriteRenderer.enabled = false;
         col.enabled = false;
     }
