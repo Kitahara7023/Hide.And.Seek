@@ -15,7 +15,7 @@ public class BombManager : MonoBehaviour
         Instance = this;
     }
 
-    // 爆弾を配置
+    // 最初から爆弾を配置
    
     public void SpawnBomb()
     {
@@ -39,9 +39,7 @@ public class BombManager : MonoBehaviour
             if (panel.hasBomb)
                 continue;
 
-            Bomb bomb = Instantiate(bombPrefab);
-
-            bomb.SetPanel(panel);
+            PlaceBomb(panel);
 
             Debug.Log($"爆弾配置 ({x},{y})");
 
@@ -49,9 +47,27 @@ public class BombManager : MonoBehaviour
         }
     }
 
-   
-    // 爆発
+    // 指定したパネルに爆弾を置く
     
+    public void PlaceBomb(Panel panel)
+    {
+        if (panel == null)
+            return;
+
+        if (panel.hasBomb)
+            return;
+
+        Bomb bomb = Instantiate(bombPrefab);
+
+        bomb.SetPanel(panel);
+
+        Debug.Log(
+            $"爆弾を設置 ({panel.x},{panel.y})"
+        );
+    }
+
+    // 爆発
+
     public void Explode(Panel center)
     {
         Debug.Log(

@@ -19,6 +19,9 @@ public class GridManager : MonoBehaviour
     private Panel[,] panels;
     private Camera mainCamera;
 
+    // 爆弾設置モードかどうか
+    private bool bombMode = false;
+
     void Awake()
     {
         mainCamera = Camera.main;
@@ -47,9 +50,11 @@ public class GridManager : MonoBehaviour
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             Vector3 screenPos = Mouse.current.position.ReadValue();
+
             screenPos.z = -mainCamera.transform.position.z;
 
             Vector3 worldPos = mainCamera.ScreenToWorldPoint(screenPos);
+
             worldPos.z = 0;
 
             Debug.Log(worldPos);
@@ -58,20 +63,74 @@ public class GridManager : MonoBehaviour
 
             if (hit != null)
             {
-                Debug.Log(hit.name);
-
-                Debug.Log($"Hit Position = {hit.transform.position}");
-
                 Panel panel = hit.GetComponent<Panel>();
 
                 if (panel != null)
                 {
-                    Debug.Log(panel.transform.position);
+                    // 爆弾設置モード
+                    if (bombMode)
+                    {
+                        PlaceBomb(panel);
 
+                        return;
+                    }
+
+                    // 通常モード
                     panel.BreakPanel();
                 }
             }
         }
+    }
+
+    // 爆弾設置モードを開始
+
+    public void StartBombMode()
+    {
+        bombMode = true;
+
+        Debug.Log("爆弾設置モード開始");
+    }
+
+    // 爆弾を設置
+    
+    void PlaceBomb(Panel panel)
+    {
+        // すでに壊れているパネルには置けない
+        if (panel.IsBroken())
+        {
+            Debug.Log("壊れたパネルには爆弾を置けません");
+
+            return;
+        }
+
+        // 小人がいるパネルには置けない
+        if (panel.dwarf != null)
+        {
+            Debug.Log("小人がいるパネルには爆弾を置けません");
+
+            return;
+        }
+
+        // すでに爆弾がある
+        if (panel.hasBomb)
+        {
+            Debug.Log("このパネルにはすでに爆弾があります");
+
+            return;
+        }
+
+        // 爆弾を設置
+        BombManager.Instance.PlaceBomb(panel);
+
+        // 1ターン消費
+        GameManager.Instance.UseTurn();
+
+        Debug.Log($"爆弾を設置 ({panel.x},{panel.y})");
+
+        // 通常モードに戻る
+        bombMode = false;
+
+        Debug.Log("爆弾設置モード終了");
     }
 
     void CreateGrid()
@@ -90,8 +149,15 @@ public class GridManager : MonoBehaviour
 
                 Debug.Log($"Panel ({x},{y}) = {pos}");
 
-                GameObject obj = Instantiate(panelPrefab, pos, Quaternion.identity, transform);
-                panels[x, y] = obj.GetComponent<Panel>();
+                GameObject obj =
+                    Instantiate(
+                        panelPrefab,
+                        pos,
+                        Quaternion.identity,
+                        transform
+
+                    );
+
 
                 Panel panel = obj.GetComponent<Panel>();
 
