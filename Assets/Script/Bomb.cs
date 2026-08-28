@@ -5,6 +5,9 @@ public class Bomb : MonoBehaviour
     // 今いるパネル
     public Panel currentPanel;
 
+    // すでに爆発したか
+    private bool exploded = false;
+
     public void SetPanel(Panel panel)
     {
         currentPanel = panel;
@@ -16,12 +19,11 @@ public class Bomb : MonoBehaviour
         transform.position = panel.transform.position;
 
         // パネルより下に表示
-        SpriteRenderer renderer =
-            GetComponent<SpriteRenderer>();
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
 
-        if (renderer != null)
+        if (sr != null)
         {
-            renderer.sortingOrder = -1;
+            sr.sortingOrder = -1;
         }
 
         Debug.Log(
@@ -31,8 +33,15 @@ public class Bomb : MonoBehaviour
 
     public void Explode()
     {
-        Debug.Log("爆弾発見！");
+        // すでに爆発していたら何もしない
+        if (exploded)
+            return;
 
+        exploded = true;
+
+        Debug.Log("爆弾が爆発！");
+
+        // 爆弾を消す
         Destroy(gameObject);
     }
 }
