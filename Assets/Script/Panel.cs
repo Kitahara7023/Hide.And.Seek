@@ -46,7 +46,13 @@ public class Panel : MonoBehaviour
         // 直接クリックされた場合だけターンを減らす
         if (useTurn)
         {
+            Debug.Log("通常クリック → ターンを1減らす");
+
             GameManager.Instance.UseTurn();
+        }
+        else
+        {
+            Debug.Log("爆発による破壊 → ターンを減らさない");
         }
 
         // 小人
