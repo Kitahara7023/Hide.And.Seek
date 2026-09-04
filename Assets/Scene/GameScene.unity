@@ -731,8 +731,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 48
-  m_fontSizeBase: 48
+  m_fontSize: 45
+  m_fontSizeBase: 45
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -910,6 +910,7 @@ MonoBehaviour:
   height: 7
   spacing: 1.1
   bombCount: 3
+  bombButton: {fileID: 1357621541}
 --- !u!4 &1243323303
 Transform:
   m_ObjectHideFlags: 0

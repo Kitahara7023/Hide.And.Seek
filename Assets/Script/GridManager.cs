@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class GridManager : MonoBehaviour
 {
@@ -16,11 +17,20 @@ public class GridManager : MonoBehaviour
     [Header("爆弾の数")]
     public int bombCount = 5;
 
+    [Header("爆弾設置ボタン")]
+    public Button bombButton;
+
     private Panel[,] panels;
     private Camera mainCamera;
 
     // 爆弾設置モードかどうか
     private bool bombMode = false;
+
+    // 爆弾設置後、何ターン経過したか
+    private int bombCooldown = 0;
+
+    // 爆弾を再び使えるまでのターン数
+    private const int BombCooldownMax = 3;
 
     void Awake()
     {
@@ -43,27 +53,38 @@ public class GridManager : MonoBehaviour
         {
             BombManager.Instance.SpawnBomb();
         }
+
+        // 最初は爆弾設置可能
+        bombCooldown = BombCooldownMax;
+
+        // ボタンの表示を更新
+        UpdateBombButton();
     }
 
     void Update()
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            Vector3 screenPos = Mouse.current.position.ReadValue();
+            Vector3 screenPos =
+                Mouse.current.position.ReadValue();
 
-            screenPos.z = -mainCamera.transform.position.z;
+            screenPos.z =
+                -mainCamera.transform.position.z;
 
-            Vector3 worldPos = mainCamera.ScreenToWorldPoint(screenPos);
+            Vector3 worldPos =
+                mainCamera.ScreenToWorldPoint(screenPos);
 
             worldPos.z = 0;
 
             Debug.Log(worldPos);
 
-            Collider2D hit = Physics2D.OverlapPoint(worldPos);
+            Collider2D hit =
+                Physics2D.OverlapPoint(worldPos);
 
             if (hit != null)
             {
-                Panel panel = hit.GetComponent<Panel>();
+                Panel panel =
+                    hit.GetComponent<Panel>();
 
                 if (panel != null)
                 {
@@ -77,6 +98,9 @@ public class GridManager : MonoBehaviour
 
                     // 通常モード
                     panel.BreakPanel();
+
+                    // 1ターン経過
+                    AddBombCooldownTurn();
                 }
             }
         }
@@ -86,9 +110,22 @@ public class GridManager : MonoBehaviour
 
     public void StartBombMode()
     {
+        // まだ使えない場合
+        if (bombCooldown < BombCooldownMax)
+        {
+            Debug.Log(
+                $"まだ爆弾を使えません。" +
+                $"あと {BombCooldownMax - bombCooldown} ターン"
+            );
+
+            return;
+        }
+
         bombMode = true;
 
         Debug.Log("爆弾設置モード開始");
+
+        UpdateBombButton();
     }
 
     // 爆弾を設置
@@ -127,16 +164,84 @@ public class GridManager : MonoBehaviour
 
         Debug.Log($"爆弾を設置 ({panel.x},{panel.y})");
 
-        // 通常モードに戻る
+        // 爆弾を使ったのでクールダウン開始
+        bombCooldown = 0;
+
+        // 爆弾設置モード終了
         bombMode = false;
+
+        // ボタンの色を更新
+        UpdateBombButton();
 
         Debug.Log("爆弾設置モード終了");
     }
 
+    // ターン経過
+    
+    void AddBombCooldownTurn()
+    {
+        // すでに最大なら何もしない
+        if (bombCooldown >= BombCooldownMax)
+            return;
+
+        bombCooldown++;
+
+        Debug.Log(
+            $"爆弾クールダウン：" +
+            $"{bombCooldown}/{BombCooldownMax}"
+        );
+
+        // ボタンの表示を更新
+        UpdateBombButton();
+
+        if (bombCooldown >= BombCooldownMax)
+        {
+            Debug.Log(
+                "爆弾設置が再び使用可能になりました！"
+            );
+        }
+    }
+
+    // 爆弾ボタンの表示更新
+    
+    void UpdateBombButton()
+    {
+        if (bombButton == null)
+            return;
+
+        // 使用可能
+        if (bombCooldown >= BombCooldownMax)
+        {
+            bombButton.interactable = true;
+
+            ColorBlock colors = bombButton.colors;
+
+            colors.normalColor = Color.white;
+
+            bombButton.colors = colors;
+        }
+        // 使用不可
+        else
+        {
+            bombButton.interactable = false;
+
+            ColorBlock colors = bombButton.colors;
+
+            colors.normalColor = Color.gray;
+
+            bombButton.colors = colors;
+        }
+    }
+
+    // 盤面生成
+
     void CreateGrid()
     {
-        float startX = -(width - 1) * spacing / 2f;
-        float startY = (height - 1) * spacing / 2f;
+        float startX =
+            -(width - 1) * spacing / 2f;
+
+        float startY =
+            (height - 1) * spacing / 2f;
 
         for (int x = 0; x < width; x++)
         {
@@ -159,7 +264,8 @@ public class GridManager : MonoBehaviour
                     );
 
 
-                Panel panel = obj.GetComponent<Panel>();
+                Panel panel =
+                    obj.GetComponent<Panel>();
 
                 panel.x = x;
                 panel.y = y;
