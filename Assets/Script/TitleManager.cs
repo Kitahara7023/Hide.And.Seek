@@ -77,6 +77,10 @@ public class TitleManager : MonoBehaviour
     {
         Debug.Log("ÉQÅ[ÉÄÇèIóπÇµÇ‹Ç∑");
 
-        Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+    Application.Quit();
+#endif
     }
 }
