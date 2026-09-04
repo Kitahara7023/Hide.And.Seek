@@ -12,6 +12,9 @@ public class Panel : MonoBehaviour
     public bool hasBomb = false;
     public bool hasItem = false;
 
+    // ‚±‚Ìƒpƒlƒ‹‚É‚ ‚é”š’e
+    public Bomb bomb;
+
     private SpriteRenderer spriteRenderer;
     private Collider2D col;
 

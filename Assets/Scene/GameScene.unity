@@ -706,8 +706,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u7206\u5F3E\u8A2D\u7F6E"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8aa4bcdde99b3864aba2cefcbd256138, type: 2}
-  m_sharedMaterial: {fileID: -6443864013577879367, guid: 8aa4bcdde99b3864aba2cefcbd256138, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b7103962859fb144aa8800e82e21ddab, type: 2}
+  m_sharedMaterial: {fileID: -6443864013577879367, guid: b7103962859fb144aa8800e82e21ddab, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

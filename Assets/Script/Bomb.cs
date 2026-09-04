@@ -5,43 +5,85 @@ public class Bomb : MonoBehaviour
     // 今いるパネル
     public Panel currentPanel;
 
-    // すでに爆発したか
-    private bool exploded = false;
+    // 最初から隠されていた爆弾かどうか
+    private bool isHiddenBomb;
 
-    public void SetPanel(Panel panel)
+    public void SetPanel( Panel panel, bool visible = false)
     {
         currentPanel = panel;
 
-        // パネルに爆弾があることを登録
+        // パネルに爆弾があることを設定
         panel.hasBomb = true;
+
+        // このパネルにあるBomb自身を登録する
+        panel.bomb = this;
 
         // パネルの位置に移動
         transform.position = panel.transform.position;
 
-        // パネルより下に表示
-        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        // SpriteRendererを取得
+        SpriteRenderer spriteRenderer =
+            GetComponent<SpriteRenderer>();
 
-        if (sr != null)
+        if (spriteRenderer == null)
         {
-            sr.sortingOrder = -1;
+            Debug.LogError("BombにSpriteRendererがありません！");
+            return;
         }
 
-        Debug.Log(
-            $"Bomb Position = {transform.position}"
-        );
+        // 隠し爆弾かどうかを記録
+        isHiddenBomb = !visible;
+
+        if (visible)
+        {
+            // 自分で設置した爆弾
+            spriteRenderer.enabled = true;
+            spriteRenderer.sortingOrder = 10;
+
+            Debug.Log("自分で設置した爆弾を表示します");
+        }
+        else
+        {
+            // 最初から配置されている隠し爆弾
+            spriteRenderer.enabled = false;
+
+            Debug.Log("隠し爆弾を非表示");
+        }
     }
 
+    // 爆発
     public void Explode()
     {
-        // すでに爆発していたら何もしない
-        if (exploded)
-            return;
-
-        exploded = true;
-
         Debug.Log("爆弾が爆発！");
 
-        // 爆弾を消す
-        Destroy(gameObject);
+        SpriteRenderer spriteRenderer =
+            GetComponent<SpriteRenderer>();
+
+        if (spriteRenderer == null)
+        {
+            Debug.LogError("BombにSpriteRendererがありません！");
+            return;
+        }
+
+        if (isHiddenBomb)
+        {
+            // 最初から隠されていた爆弾
+            spriteRenderer.enabled = true;
+
+            // パネルより手前に表示
+            spriteRenderer.sortingOrder = 10;
+
+            Debug.Log("隠されていた爆弾が姿を現した！");
+        }
+        else
+        {
+            
+            // 自分で設置した爆弾
+            // 何もしない
+            // すでに表示されているので、
+            // そのまま表示しておく
+
+            Debug.Log("自分で設置した爆弾が爆発！");
+        }
     }
 }

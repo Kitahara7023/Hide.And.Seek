@@ -16,7 +16,7 @@ public class BombManager : MonoBehaviour
     }
 
     // 最初から爆弾を配置
-   
+
     public void SpawnBomb()
     {
         Panel[,] panels = gridManager.GetPanels();
@@ -39,7 +39,11 @@ public class BombManager : MonoBehaviour
             if (panel.hasBomb)
                 continue;
 
-            PlaceBomb(panel);
+            // 最初から配置する爆弾
+            Bomb bomb = Instantiate(bombPrefab);
+
+            // false → 見えない
+            bomb.SetPanel(panel, false);
 
             Debug.Log($"爆弾配置 ({x},{y})");
 
@@ -48,7 +52,7 @@ public class BombManager : MonoBehaviour
     }
 
     // 指定したパネルに爆弾を置く
-    
+
     public void PlaceBomb(Panel panel)
     {
         if (panel == null)
@@ -57,9 +61,11 @@ public class BombManager : MonoBehaviour
         if (panel.hasBomb)
             return;
 
+        // 爆弾を生成
         Bomb bomb = Instantiate(bombPrefab);
 
-        bomb.SetPanel(panel);
+        // true → 見える
+        bomb.SetPanel(panel, true);
 
         Debug.Log(
             $"爆弾を設置 ({panel.x},{panel.y})"
@@ -71,8 +77,14 @@ public class BombManager : MonoBehaviour
     public void Explode(Panel center)
     {
         Debug.Log(
-            $"爆発開始！ 中心 ({center.x},{center.y})"
+        $"爆発開始！ 中心 ({center.x},{center.y})"
         );
+
+        // 中心パネルにある爆弾を爆発させる
+        if (center.bomb != null)
+        {
+            center.bomb.Explode();
+        }
 
         Panel[,] panels = gridManager.GetPanels();
 

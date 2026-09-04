@@ -63,20 +63,20 @@ public class GridManager : MonoBehaviour
 
     void Update()
     {
+        // クリアまたはゲームオーバー後は操作しない
+        if (GameManager.Instance.isGameClear ||
+            GameManager.Instance.isGameOver)
+        {
+            return;
+        }
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            Vector3 screenPos =
-                Mouse.current.position.ReadValue();
+            Vector3 screenPos = Mouse.current.position.ReadValue();
+            screenPos.z = -mainCamera.transform.position.z;
 
-            screenPos.z =
-                -mainCamera.transform.position.z;
-
-            Vector3 worldPos =
-                mainCamera.ScreenToWorldPoint(screenPos);
-
+            Vector3 worldPos = mainCamera.ScreenToWorldPoint(screenPos);
             worldPos.z = 0;
-
-            Debug.Log(worldPos);
 
             Collider2D hit =
                 Physics2D.OverlapPoint(worldPos);
@@ -88,7 +88,6 @@ public class GridManager : MonoBehaviour
 
                 if (panel != null)
                 {
-                    // 爆弾設置モード
                     if (bombMode)
                     {
                         PlaceBomb(panel);
@@ -96,10 +95,9 @@ public class GridManager : MonoBehaviour
                         return;
                     }
 
-                    // 通常モード
                     panel.BreakPanel();
 
-                    // 1ターン経過
+                    // 爆弾のクールダウンを1進める
                     AddBombCooldownTurn();
                 }
             }
@@ -121,10 +119,12 @@ public class GridManager : MonoBehaviour
             return;
         }
 
+        // 爆弾設置モードにする
         bombMode = true;
 
         Debug.Log("爆弾設置モード開始");
 
+        // ボタン表示を更新
         UpdateBombButton();
     }
 
