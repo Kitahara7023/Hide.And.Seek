@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -51,6 +52,12 @@ public class GameManager : MonoBehaviour
         // ターンを1減らす
         currentTurn--;
 
+        // 0未満にならないようにする
+        if (currentTurn < 0)
+        {
+            currentTurn = 0;
+        }
+
         // UI更新
         UIManager.Instance.UpdateTurn(currentTurn);
 
@@ -78,7 +85,9 @@ public class GameManager : MonoBehaviour
         // クリア状態にする
         isGameClear = true;
 
+        Debug.Log("================================");
         Debug.Log("GAME CLEAR");
+        Debug.Log("================================");
 
         // クリアUIを表示
         UIManager.Instance.ShowClear();
@@ -94,9 +103,27 @@ public class GameManager : MonoBehaviour
         // ゲームオーバー状態にする
         isGameOver = true;
 
+        Debug.Log("================================");
         Debug.Log("GAME OVER");
+        Debug.Log("================================");
 
         // ゲームオーバーUIを表示
         UIManager.Instance.ShowGameOver();
+    }
+
+    // リトライ
+    public void Retry()
+    {
+        Debug.Log("リトライします");
+
+        // 現在のシーンをもう一度読み込む
+        SceneManager.LoadScene(
+            SceneManager.GetActiveScene().name
+        );
+    }
+
+    public void Title()
+    {
+        SceneManager.LoadScene("Title");
     }
 }

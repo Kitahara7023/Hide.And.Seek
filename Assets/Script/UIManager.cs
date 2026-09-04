@@ -10,6 +10,9 @@ public class UIManager : MonoBehaviour
     // 残りターン表示
     public TMP_Text turnText;
 
+    // クリア時の残りターン表示
+    public TMP_Text turnResultText;
+
     // ゲームクリア表示
     public GameObject clearPanel;
 
@@ -53,6 +56,10 @@ public class UIManager : MonoBehaviour
     public void ShowClear()
     {
         clearPanel.SetActive(true);
+
+        // クリア時の残りターンを表示
+        turnResultText.text =
+            "残りターン : " + GameManager.Instance.currentTurn;
     }
 
     
