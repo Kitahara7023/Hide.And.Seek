@@ -71,4 +71,12 @@ public class TitleManager : MonoBehaviour
         page2.SetActive(true);
         page3.SetActive(false);
     }
+
+    // EXITボタンを押した時
+    public void ExitGame()
+    {
+        Debug.Log("ゲームを終了します");
+
+        Application.Quit();
+    }
 }
