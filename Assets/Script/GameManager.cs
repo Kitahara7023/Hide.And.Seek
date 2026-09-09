@@ -14,6 +14,12 @@ public class GameManager : MonoBehaviour
     public bool isGameClear;
     public bool isGameOver;
 
+    // 見つけた小人の数
+    public int foundDwarfCount = 0;
+
+    // 必要な小人の数
+    public int requiredDwarfCount = 1;
+
     void Awake()
     {
         if (Instance == null)
@@ -28,15 +34,44 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // ゲーム開始時に状態を初期化
         isGameClear = false;
         isGameOver = false;
 
-        // ターン数を初期化
+        // GameSettingsからターン数を取得
+
+        if (GameSettings.Instance != null)
+        {
+            startTurn = GameSettings.Instance.startTurn;
+
+            requiredDwarfCount =
+                GameSettings.Instance.dwarfCount;
+
+            Debug.Log(
+                "GameSettingsからターン数を取得 : "
+                + startTurn
+            );
+
+            Debug.Log(
+                "必要な小人の数 : "
+                + requiredDwarfCount
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "GameSettings.Instanceが見つかりません。"
+                + "Inspectorの設定値を使用します。"
+            );
+        }
+
+        // 最初のターン数を設定
         currentTurn = startTurn;
 
         // UIにターン数を表示
         UIManager.Instance.UpdateTurn(currentTurn);
+
+        // 小人の発見数を初期化
+        foundDwarfCount = 0;
 
         Debug.Log("ゲーム開始");
         Debug.Log("残りターン : " + currentTurn);
@@ -72,6 +107,28 @@ public class GameManager : MonoBehaviour
             UIManager.Instance.UpdateTurn(currentTurn);
 
             GameOver();
+        }
+    }
+
+    public void FoundDwarf()
+    {
+        if (isGameClear || isGameOver)
+            return;
+
+        foundDwarfCount++;
+
+        Debug.Log(
+            "小人を発見！ " +
+            foundDwarfCount +
+            " / " +
+            requiredDwarfCount
+        );
+
+
+        // 全員見つけたか確認
+        if (foundDwarfCount >= requiredDwarfCount)
+        {
+            GameClear();
         }
     }
 

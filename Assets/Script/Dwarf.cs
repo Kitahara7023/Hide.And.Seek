@@ -39,7 +39,7 @@ public class Dwarf : MonoBehaviour
     {
         Debug.Log("¬l‚ğ”­Œ©I");
 
-        GameManager.Instance.GameClear();
+        GameManager.Instance.FoundDwarf();
 
         //Destroy(gameObject);
     }
