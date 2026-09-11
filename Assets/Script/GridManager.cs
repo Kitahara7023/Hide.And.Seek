@@ -20,6 +20,12 @@ public class GridManager : MonoBehaviour
     [Header("爆弾設置ボタン")]
     public Button bombButton;
 
+    [Header("カメラ設定")]
+    public Camera targetCamera;
+
+    // 盤面の周囲に少し余白を作る
+    public float cameraMargin = 1.0f;
+
     private Panel[,] panels;
     private Camera mainCamera;
 
@@ -31,7 +37,16 @@ public class GridManager : MonoBehaviour
 
     void Awake()
     {
-        mainCamera = Camera.main;
+        // Inspectorでカメラを設定していればそれを使用
+        if (targetCamera != null)
+        {
+            mainCamera = targetCamera;
+        }
+        else
+        {
+            // 設定されていなければMain Cameraを取得
+            mainCamera = Camera.main;
+        }
     }
 
 
@@ -78,6 +93,10 @@ public class GridManager : MonoBehaviour
         // パネルを生成
 
         CreateGrid();
+
+        // カメラを盤面サイズに合わせる
+
+        AdjustCamera();
 
         // 小人を配置
 
@@ -165,6 +184,66 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    // カメラサイズを盤面に合わせる
+
+    void AdjustCamera()
+    {
+        if (mainCamera == null)
+        {
+            Debug.LogWarning(
+                "Main Cameraが見つかりません。"
+            );
+
+            return;
+        }
+
+
+        // 盤面の横幅
+        float boardWidth =
+            (width - 1) * spacing;
+
+
+        // 盤面の縦幅
+        float boardHeight =
+            (height - 1) * spacing;
+
+
+        // カメラの縦方向に必要なサイズ
+        float verticalSize =
+            (boardHeight / 2f)
+            + cameraMargin;
+
+
+        // 画面のアスペクト比
+        float aspect =
+            (float)Screen.width /
+            Screen.height;
+
+
+        // 横幅から必要なカメラサイズを計算
+        float horizontalSize =
+            (boardWidth / aspect / 2f)
+            + cameraMargin;
+
+
+        // 縦・横のうち大きい方を使用
+        float cameraSize =
+            Mathf.Max(
+                verticalSize,
+                horizontalSize
+            );
+
+
+        mainCamera.orthographicSize =
+            cameraSize;
+
+
+        Debug.Log(
+            "カメラサイズを調整 : "
+            + cameraSize
+        );
     }
 
     // 爆弾設置モード開始

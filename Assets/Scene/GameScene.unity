@@ -1726,6 +1726,8 @@ MonoBehaviour:
   spacing: 1.1
   bombCount: 3
   bombButton: {fileID: 1357621541}
+  targetCamera: {fileID: 519420031}
+  cameraMargin: 1
 --- !u!4 &1243323303
 Transform:
   m_ObjectHideFlags: 0
@@ -1911,6 +1913,8 @@ MonoBehaviour:
   currentTurn: 0
   isGameClear: 0
   isGameOver: 0
+  foundDwarfCount: 0
+  requiredDwarfCount: 1
 --- !u!4 &1316875353
 Transform:
   m_ObjectHideFlags: 0
