@@ -37,23 +37,32 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        // 開始時はパネルを非表示
         clearPanel.SetActive(false);
         gameOverPanel.SetActive(false);
 
-        // ターン数を表示
-        UpdateTurn(GameManager.Instance.currentTurn);
+        // GameManagerの初期設定が終わってから
+        // UIを更新する
+        Invoke(nameof(InitializeUI), 0.01f);
+    }
 
-        // 小人の発見数を表示
+    void InitializeUI()
+    {
+        // 残りターンを表示
+        UpdateTurn(
+            GameManager.Instance.currentTurn
+        );
+
+        // 小人の人数を表示
         UpdateDwarfCount(
             GameManager.Instance.foundDwarfCount,
             GameManager.Instance.requiredDwarfCount
         );
     }
 
-    
+
+
     /// ターン数を更新する
-    
+
     public void UpdateTurn(int turn)
     {
         turnText.text = "TURN : " + turn;
