@@ -124,6 +124,11 @@ public class GameManager : MonoBehaviour
             requiredDwarfCount
         );
 
+        UIManager.Instance.UpdateDwarfCount(
+        foundDwarfCount,
+        requiredDwarfCount
+    );
+
 
         // ‘SˆõŒ©‚Â‚¯‚½‚©Šm”F
         if (foundDwarfCount >= requiredDwarfCount)

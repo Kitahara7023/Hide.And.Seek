@@ -35,6 +35,12 @@ public class TitleManager : MonoBehaviour
             titlePanel.SetActive(false);
         }
 
+        // HOW TO PLAYを非表示
+        if (howToPlayPanel != null)
+        {
+            howToPlayPanel.SetActive(false);
+        }
+
         // 設定画面を表示
         settingPanel.SetActive(true);
     }
@@ -126,6 +132,14 @@ public class TitleManager : MonoBehaviour
     // HOW TO PLAYを開いた時
     public void OpenHowToPlay()
     {
+        Debug.Log("HOW TO PLAYを開きました");
+
+        // 設定画面を非表示
+        if (settingPanel != null)
+        {
+            settingPanel.SetActive(false);
+        }
+
         // HOW TO PLAY画面を表示
         howToPlayPanel.SetActive(true);
 
@@ -144,7 +158,20 @@ public class TitleManager : MonoBehaviour
             titlePanel.SetActive(false);
         }
 
-        Debug.Log("HOW TO PLAYを開きました");
+    }
+
+    public void CloseHowToPlay()
+    {
+        // HOW TO PLAYを閉じる
+        howToPlayPanel.SetActive(false);
+
+        // タイトル画面を表示
+        GameObject titlePanel = GameObject.Find("TitlePanel");
+
+        if (titlePanel != null)
+        {
+            titlePanel.SetActive(true);
+        }
     }
 
     // Page1 → Page2
