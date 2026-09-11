@@ -160,7 +160,7 @@ public class HintManager : MonoBehaviour
             if (usedHintCount == 0)
                 return 3;
 
-            return 1;
+            return 2;
         }
 
         if (gridManager.Width == 7)
