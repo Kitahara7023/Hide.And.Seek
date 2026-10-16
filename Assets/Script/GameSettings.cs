@@ -6,20 +6,24 @@ public class GameSettings : MonoBehaviour
     public static GameSettings Instance;
 
     [Header("ゲーム設定")]
-    // パネルの横幅
+
+    [Header("パネルの横幅")] 
     public int panelWidth = 7;
 
-    // パネルの縦幅
+    [Header("パネルの縦幅")]
     public int panelHeight = 7;
 
-    // 爆弾の数
+    [Header("爆弾の数")]// 
     public int bombCount = 5;
 
-    // 残りターン
+    [Header("残りターン")] 
     public int startTurn = 15;
 
-    // 小人の数
+    [Header("小人の数")]
     public int dwarfCount = 1;
+
+    [Header("小人の移動設定")]
+    public bool dwarfsCanMove = false;
 
     private void Awake()
     {

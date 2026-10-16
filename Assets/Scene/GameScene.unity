@@ -1948,7 +1948,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DwarfManager
   gridManager: {fileID: 1243323302}
-  DwarfPrefab: {fileID: 932120571203413987, guid: a8381d6079204894f9bb1cb2649a28e8, type: 3}
+  dwarfPrefab: {fileID: 932120571203413987, guid: a8381d6079204894f9bb1cb2649a28e8, type: 3}
+  dwarfs: []
 --- !u!4 &887961939
 Transform:
   m_ObjectHideFlags: 0
@@ -2003,8 +2004,13 @@ MonoBehaviour:
   - {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - {r: 1, g: 0, b: 1, a: 1}
   - {r: 0, g: 1, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 0.3921569, b: 0, a: 1}
+  - {r: 0.627451, g: 0.3215686, b: 0.1764706, a: 1}
+  - {r: 0.8705883, g: 0.7215686, b: 0.5294118, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
   hintInterval: 4
-  maxHintCount: 2
+  maxHintCount: 99
 --- !u!4 &909471577
 Transform:
   m_ObjectHideFlags: 0

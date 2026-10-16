@@ -109,10 +109,30 @@ public class GridManager : MonoBehaviour
             Debug.Log("小人の数 : " + dwarfCount);
         }
 
+        // 初期設定では小人は動かない
+        bool canMove = false;
+
+        // タイトル画面で選択した設定を取得
+        if (GameSettings.Instance != null)
+        {
+            canMove = GameSettings.Instance.dwarfsCanMove;
+        }
+
+        // ONならMove、OFFならStayにする
+        DwarfType dwarfType = canMove
+            ? DwarfType.Move
+            : DwarfType.Stay;
+
+        // 設定に応じた小人を生成
         for (int i = 0; i < dwarfCount; i++)
         {
-            DwarfManager.Instance.SpawnDwarf(DwarfType.Stay);
+            DwarfManager.Instance.SpawnDwarf(dwarfType);
         }
+
+        Debug.Log(
+            "小人の移動設定：" +
+            (canMove ? "ON" : "OFF")
+        );
 
         // 爆弾を配置
 
@@ -174,13 +194,23 @@ public class GridManager : MonoBehaviour
                         return;
                     }
 
+                    // すでに壊れているパネルは無視
+                    if (panel.IsBroken())
+                    {
+                        return;
+                    }
 
                     // 通常のパネル破壊
                     panel.BreakPanel();
 
-
                     // 爆弾クールダウンを1ターン進める
                     AddBombCooldownTurn();
+
+                    // 小人の移動
+                    if (DwarfManager.Instance != null)
+                    {
+                        DwarfManager.Instance.MoveDwarfs();
+                    }
                 }
             }
         }

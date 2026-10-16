@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TitleManager : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class TitleManager : MonoBehaviour
 
     [Header("ゲーム設定")]
     public GameObject settingPanel;
+
+    [Header("小人の移動設定")]
+    public Toggle dwarfMoveToggle;
 
     [Header("ゲーム設定Dropdown")]
     public TMP_Dropdown panelSizeDropdown;
@@ -42,12 +46,32 @@ public class TitleManager : MonoBehaviour
         }
 
         // 設定画面を表示
-        settingPanel.SetActive(true);
+        if (settingPanel != null)
+        {
+            settingPanel.SetActive(true);
+        }
+
+        // 保存されている移動設定をToggleに反映
+        if (GameSettings.Instance != null &&
+            dwarfMoveToggle != null)
+        {
+            dwarfMoveToggle.isOn =
+                GameSettings.Instance.dwarfsCanMove;
+        }
     }
 
     // GAME STARTボタンを押した時
     public void StartGameWithSettings()
     {
+        // GameSettingsが存在するか確認
+        if (GameSettings.Instance == null)
+        {
+            Debug.LogError(
+                "GameSettings.Instanceが見つかりません。"
+            );
+            return;
+        }
+
         // パネルサイズを取得
         switch (panelSizeDropdown.value)
         {
@@ -65,40 +89,57 @@ public class TitleManager : MonoBehaviour
                 GameSettings.Instance.panelWidth = 9;
                 GameSettings.Instance.panelHeight = 9;
                 break;
-        }
 
+            case 3:
+                GameSettings.Instance.panelWidth = 11;
+                GameSettings.Instance.panelHeight = 11;
+                break;
+
+            case 4:
+                GameSettings.Instance.panelWidth = 13;
+                GameSettings.Instance.panelHeight = 13;
+                break;
+
+            case 5:
+                GameSettings.Instance.panelWidth = 15;
+                GameSettings.Instance.panelHeight = 15;
+                break;
+        }
 
         // 爆弾の数を取得
         GameSettings.Instance.bombCount =
             bombCountDropdown.value + 1;
 
-
         // ターン数を取得
         int[] turnValues =
         {
-            5,
-            10,
-            15,
-            20,
-            25,
-            30,
-            35,
-            40,
-            45,
-            50
+            5, 10, 15, 20, 25,
+            30, 35, 40, 45
         };
 
-        GameSettings.Instance.startTurn =
-            turnValues[turnCountDropdown.value];
+        int turnIndex = Mathf.Clamp(
+            turnCountDropdown.value,
+            0,
+            turnValues.Length - 1
+        );
 
+        GameSettings.Instance.startTurn =
+            turnValues[turnIndex];
 
         // 小人の数を取得
         GameSettings.Instance.dwarfCount =
             dwarfCountDropdown.value + 1;
 
+        // 小人の移動設定を保存
+        if (dwarfMoveToggle != null)
+        {
+            GameSettings.Instance.dwarfsCanMove =
+                dwarfMoveToggle.isOn;
+        }
 
         // Consoleに設定内容を表示
         Debug.Log("========== ゲーム設定 ==========");
+
         Debug.Log(
             "パネルサイズ : " +
             GameSettings.Instance.panelWidth +
@@ -121,52 +162,56 @@ public class TitleManager : MonoBehaviour
             GameSettings.Instance.dwarfCount
         );
 
-        Debug.Log("================================");
+        Debug.Log(
+            "小人の移動 : " +
+            (GameSettings.Instance.dwarfsCanMove
+                ? "ON"
+                : "OFF")
+        );
 
+        Debug.Log("================================");
 
         // GameSceneへ移動
         SceneManager.LoadScene(gameSceneName);
     }
-
 
     // HOW TO PLAYを開いた時
     public void OpenHowToPlay()
     {
         Debug.Log("HOW TO PLAYを開きました");
 
-        // 設定画面を非表示
         if (settingPanel != null)
         {
             settingPanel.SetActive(false);
         }
 
-        // HOW TO PLAY画面を表示
-        howToPlayPanel.SetActive(true);
+        if (howToPlayPanel != null)
+        {
+            howToPlayPanel.SetActive(true);
+        }
 
-        // 最初はPage1を表示
-        page1.SetActive(true);
+        if (page1 != null) page1.SetActive(true);
+        if (page2 != null) page2.SetActive(false);
+        if (page3 != null) page3.SetActive(false);
 
-        // Page2、Page3は非表示
-        page2.SetActive(false);
-        page3.SetActive(false);
-
-        // タイトル画面を非表示
-        GameObject titlePanel = GameObject.Find("TitlePanel");
+        GameObject titlePanel =
+            GameObject.Find("TitlePanel");
 
         if (titlePanel != null)
         {
             titlePanel.SetActive(false);
         }
-
     }
 
     public void CloseHowToPlay()
     {
-        // HOW TO PLAYを閉じる
-        howToPlayPanel.SetActive(false);
+        if (howToPlayPanel != null)
+        {
+            howToPlayPanel.SetActive(false);
+        }
 
-        // タイトル画面を表示
-        GameObject titlePanel = GameObject.Find("TitlePanel");
+        GameObject titlePanel =
+            GameObject.Find("TitlePanel");
 
         if (titlePanel != null)
         {
@@ -210,7 +255,7 @@ public class TitleManager : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
-    Application.Quit();
+        Application.Quit();
 #endif
     }
 }

@@ -3,78 +3,195 @@ using System.Collections.Generic;
 
 public class DwarfManager : MonoBehaviour
 {
-    // シングルトン
     public static DwarfManager Instance;
 
-    [Header("GridManager")]
+    [Header("盤面")]
     public GridManager gridManager;
 
-    [Header("小人Prefab")]
-    public Dwarf DwarfPrefab;
+    [Header("小人のPrefab")]
+    public Dwarf dwarfPrefab;
 
-    // 小人がいるパネルを保存
-    private List<Dwarf> dwarfs = new List<Dwarf>();
+    [Header("生成した小人")]
+    public List<Dwarf> dwarfs = new List<Dwarf>();
 
     private void Awake()
     {
         Instance = this;
     }
 
-    void Start()
-    {
-        
-    }
-
-    /// 小人を配置する
-
+    // 小人を生成する
     public void SpawnDwarf(DwarfType type)
     {
-        Debug.Log("SpawnDwarf開始");
-
-        Panel[,] panels = gridManager.GetPanels();
-
-        Debug.Log($"panels = {panels}");
-
-        for (int i = 0; i < 100; i++)
+        if (gridManager == null || dwarfPrefab == null)
         {
-            int x = Random.Range(0, gridManager.Width);
-            int y = Random.Range(0, gridManager.Height);
-
-            Panel panel = panels[x, y];
-
-            Debug.Log($"[{x},{y}] panel = {panel}");
-
-            if (panel == null)
-            {
-                Debug.LogError("Panelがnullです");
-                continue;
-            }
-
-            Debug.Log($"dwarf = {panel.dwarf}");
-
-            if (panel.dwarf != null)
-            {
-                Debug.Log("既に小人がいます");
-                continue;
-            }
-
-            Debug.Log("ここまで来ました");
-
-            Dwarf dwarf = Instantiate(DwarfPrefab);
-
-            dwarf.dwarfType = type;
-            dwarf.SetPanel(panel);
-
-            //dwarf.gameObject.SetActive(false);
-
-            dwarfs.Add(dwarf);
-
-            Debug.Log($"小人配置 ({x},{y})");
-
+            Debug.LogError(
+                "DwarfManagerのGridManagerまたはPrefabが未設定です。");
             return;
         }
 
-        Debug.LogError("小人を配置できませんでした");
+        Panel[,] panels = gridManager.GetPanels();
+
+        if (panels == null)
+        {
+            return;
+        }
+
+        List<Panel> candidates = new List<Panel>();
+
+        // 小人を配置できるパネルを探す
+        for (int x = 0; x < panels.GetLength(0); x++)
+        {
+            for (int y = 0; y < panels.GetLength(1); y++)
+            {
+                Panel panel = panels[x, y];
+
+                if (CanMoveTo(panel))
+                {
+                    candidates.Add(panel);
+                }
+            }
+        }
+
+        if (candidates.Count == 0)
+        {
+            Debug.LogWarning("小人を配置できるパネルがありません。");
+            return;
+        }
+
+        // 候補からランダムに選ぶ
+        Panel selectedPanel =
+            candidates[Random.Range(0, candidates.Count)];
+
+        // 小人を生成
+        Dwarf dwarf = Instantiate(dwarfPrefab);
+
+        dwarf.dwarfType = type;
+        dwarf.SetPanel(selectedPanel);
+
+        dwarfs.Add(dwarf);
     }
-   
+
+    // 指定パネルに移動できるか確認する
+    private bool CanMoveTo(Panel panel)
+    {
+        if (panel == null)
+        {
+            return false;
+        }
+
+        // 壊れたパネルには移動できない
+        if (panel.IsBroken())
+        {
+            return false;
+        }
+
+        // ほかの小人がいるパネルには移動できない
+        if (panel.dwarf != null)
+        {
+            return false;
+        }
+
+        // 爆弾があるパネルには移動できない
+        if (panel.hasBomb)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    // Moveタイプの小人を1マス移動させる
+    public void MoveDwarfs()
+    {
+        // ゲーム終了後は移動しない
+        if (GameManager.Instance != null &&
+            (GameManager.Instance.isGameOver ||
+             GameManager.Instance.isGameClear))
+        {
+            return;
+        }
+
+        if (gridManager == null)
+        {
+            return;
+        }
+
+        Panel[,] panels = gridManager.GetPanels();
+
+        if (panels == null)
+        {
+            return;
+        }
+
+        int width = panels.GetLength(0);
+        int height = panels.GetLength(1);
+
+        // 上・下・左・右
+        Vector2Int[] directions =
+        {
+            new Vector2Int(0, 1),
+            new Vector2Int(0, -1),
+            new Vector2Int(-1, 0),
+            new Vector2Int(1, 0)
+        };
+
+        // すべての小人を確認
+        foreach (Dwarf dwarf in dwarfs)
+        {
+            if (dwarf == null || dwarf.isFound)
+            {
+                continue;
+            }
+
+            // Stayタイプは移動しない
+            if (dwarf.dwarfType != DwarfType.Move)
+            {
+                continue;
+            }
+
+            Panel current = dwarf.currentPanel;
+
+            if (current == null)
+            {
+                continue;
+            }
+
+            List<Panel> candidates = new List<Panel>();
+
+            // 上下左右の隣のパネルを調べる
+            foreach (Vector2Int direction in directions)
+            {
+                int nextX = current.x + direction.x;
+                int nextY = current.y + direction.y;
+
+                // 盤面の外なら無視
+                if (nextX < 0 || nextX >= width ||
+                    nextY < 0 || nextY >= height)
+                {
+                    continue;
+                }
+
+                Panel nextPanel = panels[nextX, nextY];
+
+                // 移動可能なパネルだけ候補に入れる
+                if (CanMoveTo(nextPanel))
+                {
+                    candidates.Add(nextPanel);
+                }
+            }
+
+            // 移動先がなければ、その場にとどまる
+            if (candidates.Count == 0)
+            {
+                continue;
+            }
+
+            // 隣接パネルからランダムに選択
+            Panel destination =
+                candidates[Random.Range(0, candidates.Count)];
+
+            // 小人を移動
+            dwarf.SetPanel(destination);
+        }
+    }
 }

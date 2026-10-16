@@ -59,8 +59,6 @@ public class UIManager : MonoBehaviour
         );
     }
 
-
-
     /// ターン数を更新する
 
     public void UpdateTurn(int turn)
