@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class TitleManager : MonoBehaviour
 {
+    [Header("タイトル画面")]
+    public GameObject titlePanel;
+
     [Header("ゲームシーン名")]
     public string gameSceneName = "GameScene";
 
@@ -13,6 +16,7 @@ public class TitleManager : MonoBehaviour
     public GameObject page1;
     public GameObject page2;
     public GameObject page3;
+    public GameObject page4;
 
     [Header("ゲーム設定")]
     public GameObject settingPanel;
@@ -193,6 +197,7 @@ public class TitleManager : MonoBehaviour
         if (page1 != null) page1.SetActive(true);
         if (page2 != null) page2.SetActive(false);
         if (page3 != null) page3.SetActive(false);
+        if (page4 != null) page4.SetActive(false);
 
         GameObject titlePanel =
             GameObject.Find("TitlePanel");
@@ -220,17 +225,52 @@ public class TitleManager : MonoBehaviour
     }
 
     // Page1 → Page2
-    public void NextPage()
+    public void NextPage2()
     {
         page1.SetActive(false);
         page2.SetActive(true);
     }
 
     // Page2 → Page3
-    public void NextPage2()
+    public void NextPage3()
     {
         page2.SetActive(false);
         page3.SetActive(true);
+    }
+
+    // Page3 → Page4
+    public void NextPage4()
+    {
+        page3.SetActive(false);
+        page4.SetActive(true);
+    }
+    
+    public void BackTitle()
+    {
+        Debug.Log("タイトルに戻る処理を開始");
+
+        if (titlePanel == null)
+        {
+            Debug.LogError("TitlePanelが登録されていません");
+            return;
+        }
+
+        // タイトル画面を表示
+        titlePanel.SetActive(true);
+
+        // 説明画面を閉じる
+        if (howToPlayPanel != null)
+        {
+            howToPlayPanel.SetActive(false);
+        }
+
+        // 設定画面を閉じる
+        if (settingPanel != null)
+        {
+            settingPanel.SetActive(false);
+        }
+
+        Debug.Log("TitlePanel activeSelf = " + titlePanel.activeSelf);
     }
 
     // Page2 → Page1
@@ -245,6 +285,13 @@ public class TitleManager : MonoBehaviour
     {
         page2.SetActive(true);
         page3.SetActive(false);
+    }
+
+    // Page4 → Page3
+    public void BackPage3()
+    {
+        page3.SetActive(true);
+        page4.SetActive(false);
     }
 
     // EXITボタンを押した時
