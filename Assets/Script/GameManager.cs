@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
     [Header("現在の状態")]
     public int currentTurn;
 
+    [Header("クリア時に非表示にするボタン")]
+    public GameObject bombButton;
+    public GameObject hintButton;
+
     public bool isGameClear;
     public bool isGameOver;
 
@@ -147,6 +151,9 @@ public class GameManager : MonoBehaviour
         // クリア状態にする
         isGameClear = true;
 
+        // 爆弾設置ボタンとヒントボタンを非表示
+        HideActionButtons();
+
         Debug.Log("================================");
         Debug.Log("GAME CLEAR");
         Debug.Log("================================");
@@ -165,12 +172,27 @@ public class GameManager : MonoBehaviour
         // ゲームオーバー状態にする
         isGameOver = true;
 
+        // 爆弾設置ボタンとヒントボタンを非表示
+        HideActionButtons();
+
         Debug.Log("================================");
         Debug.Log("GAME OVER");
         Debug.Log("================================");
 
         // ゲームオーバーUIを表示
         UIManager.Instance.ShowGameOver();
+    }
+
+    // ゲームクリア時にボタンを非表示にする
+    public void HideActionButtons()
+    {
+        if (bombButton != null)
+            bombButton.SetActive(false);
+
+        if (hintButton != null)
+            hintButton.SetActive(false);
+
+        Debug.Log("爆弾設置ボタンとヒントボタンを非表示にしました");
     }
 
     // リトライ
