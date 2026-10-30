@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
     [Header("現在の状態")]
     public int currentTurn;
 
+    [Header("盤面管理")]
+    [SerializeField] private GridManager gridManager;
+
     [Header("クリア時に非表示にするボタン")]
     public GameObject bombButton;
     public GameObject hintButton;
@@ -176,6 +179,16 @@ public class GameManager : MonoBehaviour
         Debug.Log("================================");
         Debug.Log("GAME OVER");
         Debug.Log("================================");
+
+        // 小人の隠れていた場所を公開
+        if (gridManager != null)
+        {
+            DwarfManager.Instance.RevealAllDwarfs();
+        }
+        else
+        {
+            Debug.LogError("GridManagerが設定されていません！");
+        }
 
         // ゲームオーバーUIを表示
         UIManager.Instance.ShowGameOver();

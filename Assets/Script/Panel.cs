@@ -88,6 +88,14 @@ public class Panel : MonoBehaviour
         }
     }
 
+    public void RevealDwarf()
+    {
+        if (dwarf != null)
+        {
+            dwarf.gameObject.SetActive(true);
+        }
+    }
+
     public void BreakPanel()
     {
         BreakPanel(true, false);

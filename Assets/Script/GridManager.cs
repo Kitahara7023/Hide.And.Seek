@@ -404,8 +404,18 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    // パネルを生成
+    public void RevealHiddenDwarf()
+    {
+        foreach (Panel panel in panels)
+        {
+            if (panel != null && panel.dwarf != null)
+            {
+                panel.RevealDwarf();
+            }
+        }
+    }
 
+    // パネルを生成
     void CreateGrid()
     {
         // 盤面を中央に配置するための開始位置

@@ -211,5 +211,43 @@ public class DwarfManager : MonoBehaviour
             // 小人を移動
             dwarf.SetPanel(destination);
         }
+
+
+
     }
+    // ゲームオーバー時にすべての小人を公開する
+    public void RevealAllDwarfs()
+    {
+        foreach (Dwarf dwarf in dwarfs)
+        {
+            if (dwarf == null)
+            {
+                continue;
+            }
+
+            // すでに発見されている小人はそのまま
+            if (dwarf.isFound)
+            {
+                continue;
+            }
+
+            // 小人のオブジェクトを有効化
+            dwarf.gameObject.SetActive(true);
+
+            // SpriteRendererを有効化
+            SpriteRenderer sr =
+                dwarf.GetComponent<SpriteRenderer>();
+
+            if (sr != null)
+            {
+                sr.enabled = true;
+                sr.sortingOrder = 10;
+            }
+
+            Debug.Log("隠れていた小人を公開しました");
+        }
+    }
+
+
 }
+
