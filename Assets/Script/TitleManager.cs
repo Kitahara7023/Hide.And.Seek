@@ -118,7 +118,7 @@ public class TitleManager : MonoBehaviour
         int[] turnValues =
         {
             5, 10, 15, 20, 25,
-            30, 35, 40, 45
+            30, 35, 40, 45, 50
         };
 
         int turnIndex = Mathf.Clamp(
