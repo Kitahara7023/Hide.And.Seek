@@ -179,7 +179,23 @@ public class HintManager : MonoBehaviour
             return 5;
         }
 
-        return 3;
+        if(gridManager.Width == 11)
+        {
+            if (usedHintCount == 0)
+                return 9;
+
+            return 7;
+        }
+
+        if (gridManager.Width == 13)
+        {
+            if (usedHintCount == 0)
+                return 9;
+
+            return 7;
+        }
+
+        return 5;
     }
 
     Color GetHintColor(int index)
