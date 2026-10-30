@@ -62,6 +62,19 @@ public class DwarfManager : MonoBehaviour
         Panel selectedPanel =
             candidates[Random.Range(0, candidates.Count)];
 
+        // ゲーム設定に合わせて移動タイプを決定
+        if (GameSettings.Instance != null)
+        {
+            if (GameSettings.Instance.dwarfsCanMove)
+            {
+                type = DwarfType.Move;
+            }
+            else
+            {
+                type = DwarfType.Stay;
+            }
+        }
+
         // 小人を生成
         Dwarf dwarf = Instantiate(dwarfPrefab);
 
@@ -69,6 +82,8 @@ public class DwarfManager : MonoBehaviour
         dwarf.SetPanel(selectedPanel);
 
         dwarfs.Add(dwarf);
+
+        Debug.Log("生成した小人のタイプ：" + dwarf.dwarfType);
     }
 
     // 指定パネルに移動できるか確認する
@@ -99,6 +114,13 @@ public class DwarfManager : MonoBehaviour
     // Moveタイプの小人を1マス移動させる
     public void MoveDwarfs()
     {
+        // 設定で小人の移動が禁止されている場合
+        if (GameSettings.Instance != null &&
+            !GameSettings.Instance.dwarfsCanMove)
+        {
+            return;
+        }
+
         // ゲーム終了後は移動しない
         if (GameManager.Instance != null &&
             (GameManager.Instance.isGameOver ||

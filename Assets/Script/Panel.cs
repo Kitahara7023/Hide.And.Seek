@@ -81,12 +81,16 @@ public class Panel : MonoBehaviour
 
     public void BreakPanel()
     {
-        BreakPanel(true);
+        BreakPanel(true, false);
     }
 
     public void BreakPanel(bool useTurn)
     {
-        // すでに壊れているなら何もしない
+        BreakPanel(useTurn, false);
+    }
+
+    public void BreakPanel(bool useTurn, bool moveDwarfAside)
+    {
         if (isBroken)
             return;
 
@@ -94,28 +98,20 @@ public class Panel : MonoBehaviour
 
         Debug.Log($"Break ({x},{y})");
 
-        // 直接クリックされた場合だけターンを減らす
+        // 通常クリックの場合だけターンを消費
         if (useTurn)
         {
-            Debug.Log("通常クリック → ターンを1減らす");
-
             if (GameManager.Instance != null)
-            {
                 GameManager.Instance.UseTurn();
-            }
-        }
-        else
-        {
-            Debug.Log("爆発による破壊 → ターンを減らさない");
         }
 
-        // 小人
+        // 小人がいる場合
         if (dwarf != null)
         {
             Debug.Log($"小人発見！ Panel ({x},{y})");
 
-            // 爆発によって壊された場合だけ位置をずらす
-            if (!useTurn)
+            // 爆発の中心にいる場合だけ位置をずらす
+            if (moveDwarfAside)
             {
                 dwarf.MoveAside();
             }
@@ -124,22 +120,18 @@ public class Panel : MonoBehaviour
                 dwarf.GetComponent<SpriteRenderer>();
 
             if (dwarfRenderer != null)
-            {
                 dwarfRenderer.sortingOrder = 1;
-            }
 
             dwarf.Found();
         }
 
-        // 爆弾
+        // 爆弾がある場合
         if (bombs.Count > 0)
         {
             Debug.Log($"爆弾発見！ Panel ({x},{y})");
-
             BombManager.Instance.Explode(this);
         }
 
-        // パネルを消す
         if (spriteRenderer != null)
             spriteRenderer.enabled = false;
 

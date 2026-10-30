@@ -305,41 +305,21 @@ public class GridManager : MonoBehaviour
     void PlaceBomb(Panel panel)
     {
         // 壊れたパネルには置けない
-        if (panel.IsBroken())
+        if (panel == null || panel.IsBroken())
         {
             Debug.Log("壊れたパネルには爆弾を置けません");
             return;
         }
 
-
-        // 小人がいるパネルには置けない
-        if (panel.dwarf != null)
-        {
-            Debug.Log("小人がいるパネルには爆弾を置けません");
-            return;
-        }
-
-
-        // すでに爆弾がある場合
-        if (panel.hasBomb)
-        {
-            Debug.Log("このパネルにはすでに爆弾があります");
-            return;
-        }
-
-
-        // 爆弾を設置
+        // 小人や既存の爆弾があっても設置可能
         BombManager.Instance.PlaceBomb(panel);
-
 
         // ターンを1消費
         GameManager.Instance.UseTurn();
 
-
         Debug.Log(
             $"爆弾を設置 ({panel.x},{panel.y})"
         );
-
 
         // クールダウン開始
         bombCooldown = 0;
@@ -349,10 +329,8 @@ public class GridManager : MonoBehaviour
 
         UpdateBombButton();
 
-
         Debug.Log(
-            "爆弾設置モード終了。" +
-            "3ターン後に再使用可能"
+            "爆弾設置モード終了。3ターン後に再使用可能"
         );
     }
 

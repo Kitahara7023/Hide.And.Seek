@@ -19,7 +19,16 @@ public class BombManager : MonoBehaviour
     // 最初から爆弾を配置
     public void SpawnBomb()
     {
+        if (gridManager == null || bombPrefab == null)
+        {
+            Debug.LogError("GridManagerまたはBomb Prefabが未設定です");
+            return;
+        }
+
         Panel[,] panels = gridManager.GetPanels();
+
+        if (panels == null)
+            return;
 
         List<Panel> candidates = new List<Panel>();
 
@@ -30,6 +39,7 @@ public class BombManager : MonoBehaviour
             {
                 Panel panel = panels[x, y];
 
+                // 小人や爆弾があっても配置可能
                 if (panel != null && !panel.IsBroken())
                 {
                     candidates.Add(panel);
@@ -56,7 +66,7 @@ public class BombManager : MonoBehaviour
     // 指定したパネルに爆弾を置く
     public void PlaceBomb(Panel panel)
     {
-        if (panel == null)
+        if (panel == null || bombPrefab == null)
             return;
 
         if (panel.IsBroken())
@@ -67,20 +77,24 @@ public class BombManager : MonoBehaviour
 
         bomb.SetPanel(panel, true);
 
-        Debug.Log(
-            $"爆弾を設置 ({panel.x},{panel.y})"
-        );
+        Debug.Log($"爆弾を設置 ({panel.x},{panel.y})");
     }
 
     // 爆発
     public void Explode(Panel center)
     {
+        if (center == null || gridManager == null)
+            return;
+
         Debug.Log(
             $"爆発開始！ 中心 ({center.x},{center.y})"
         );
 
         // 中心パネルにあるすべての爆弾を処理
-        foreach (Bomb bomb in center.bombs.ToArray())
+        List<Bomb> centerBombs =
+            new List<Bomb>(center.bombs);
+
+        foreach (Bomb bomb in centerBombs)
         {
             if (bomb != null)
             {
@@ -90,31 +104,31 @@ public class BombManager : MonoBehaviour
 
         Panel[,] panels = gridManager.GetPanels();
 
-        // 3×3の範囲
-        for (int dx = -1; dx <= 1; dx++)
+        if (panels == null)
+            return;
+
+        // 中心から上下左右1マスずつ、合計3×3を破壊
+        for (int x = center.x - 1; x <= center.x + 1; x++)
         {
-            for (int dy = -1; dy <= 1; dy++)
+            for (int y = center.y - 1; y <= center.y + 1; y++)
             {
-                int nx = center.x + dx;
-                int ny = center.y + dy;
+                // 盤面の外なら無視
+                if (x < 0 || x >= gridManager.Width ||
+                    y < 0 || y >= gridManager.Height)
+                {
+                    continue;
+                }
 
-                if (nx < 0 || nx >= gridManager.Width)
+                Panel panel = panels[x, y];
+
+                if (panel == null || panel.IsBroken())
                     continue;
 
-                if (ny < 0 || ny >= gridManager.Height)
-                    continue;
+                // 爆発の中心かどうか
+                bool isCenter = panel == center;
 
-                Panel panel = panels[nx, ny];
-
-                if (panel == null)
-                    continue;
-
-                if (panel.IsBroken())
-                    continue;
-
-                Debug.Log($"爆発で破壊 ({nx},{ny})");
-
-                panel.BreakPanel(false);
+                // 爆発による破壊なのでターンは消費しない
+                panel.BreakPanel(false, isCenter);
             }
         }
 
