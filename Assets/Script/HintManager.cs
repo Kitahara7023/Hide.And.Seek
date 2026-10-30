@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,6 +38,18 @@ public class HintManager : MonoBehaviour
     // 現在表示されているヒント枠
     private List<GameObject> currentHintFrames =
         new List<GameObject>();
+
+    [Header("ヒント自動切り替え")]
+    public float hintSwitchInterval = 2f;
+
+    // ヒント枠の位置情報
+    private List<HintFrameInfo> hintFrameInfos =
+        new List<HintFrameInfo>();
+
+    // 実行中の切り替え処理
+    private List<Coroutine> hintCoroutines =
+        new List<Coroutine>();
+
 
     void Update()
     {
@@ -151,6 +164,9 @@ public class HintManager : MonoBehaviour
                 dwarfIndex++;
             }
         }
+
+        // 重なっているヒント枠の自動切り替えを開始
+        StartHintSwitching();
     }
 
     int GetHintSize()
@@ -357,13 +373,214 @@ public class HintManager : MonoBehaviour
         // 作成したヒント枠をリストに追加
         currentHintFrames.Add(frame);
 
+        // ヒント枠の範囲を記録
+        hintFrameInfos.Add(
+            new HintFrameInfo(
+                dwarf,
+                frame,
+                startX,
+                startY,
+                endX,
+                endY
+            )
+        );
+
         Debug.Log(
             $"小人 ({dwarfX},{dwarfY}) のヒント枠を作成"
         );
     }
 
+    // ヒント枠の情報
+    private class HintFrameInfo
+    {
+        public Dwarf dwarf;
+        public GameObject frame;
+
+        public int startX;
+        public int startY;
+        public int endX;
+        public int endY;
+
+        public HintFrameInfo(
+            Dwarf dwarf,
+            GameObject frame,
+            int startX,
+            int startY,
+            int endX,
+            int endY)
+        {
+            this.dwarf = dwarf;
+            this.frame = frame;
+            this.startX = startX;
+            this.startY = startY;
+            this.endX = endX;
+            this.endY = endY;
+        }
+    }
+
+    // ヒント範囲が重なっているか確認
+    bool IsOverlapping(HintFrameInfo a, HintFrameInfo b)
+    {
+        // 2つの枠が重なっている範囲を計算
+        int overlapMinX = Mathf.Max(a.startX, b.startX);
+        int overlapMaxX = Mathf.Min(a.endX, b.endX);
+
+        int overlapMinY = Mathf.Max(a.startY, b.startY);
+        int overlapMaxY = Mathf.Min(a.endY, b.endY);
+
+        int overlapWidth = overlapMaxX - overlapMinX + 1;
+        int overlapHeight = overlapMaxY - overlapMinY + 1;
+
+        // 重なっていない場合
+        if (overlapWidth <= 0 || overlapHeight <= 0)
+            return false;
+
+        // 重なっている面積
+        int overlapArea = overlapWidth * overlapHeight;
+
+        // それぞれの枠の面積
+        int areaA =
+            (a.endX - a.startX + 1) *
+            (a.endY - a.startY + 1);
+
+        int areaB =
+            (b.endX - b.startX + 1) *
+            (b.endY - b.startY + 1);
+
+        // 面積が小さい方を基準にする
+        int smallerArea = Mathf.Min(areaA, areaB);
+
+        float overlapRatio =
+            (float)overlapArea / smallerArea;
+
+        // 100％の場合だけ交互表示の対象
+        return overlapRatio >= 1.0f;
+    }
+
+
+    // 重なっているヒント枠を探す
+    void StartHintSwitching()
+    {
+        List<HintFrameInfo> remaining =
+            new List<HintFrameInfo>(hintFrameInfos);
+
+        while (remaining.Count > 0)
+        {
+            // グループの最初の小人
+            List<HintFrameInfo> group =
+                new List<HintFrameInfo>();
+
+            group.Add(remaining[0]);
+            remaining.RemoveAt(0);
+
+            // 重なっている枠を同じグループにまとめる
+            bool foundOverlap = true;
+
+            while (foundOverlap)
+            {
+                foundOverlap = false;
+
+                for (int i = remaining.Count - 1; i >= 0; i--)
+                {
+                    foreach (HintFrameInfo info in group)
+                    {
+                        if (IsOverlapping(info, remaining[i]))
+                        {
+                            group.Add(remaining[i]);
+                            remaining.RemoveAt(i);
+
+                            foundOverlap = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 2人以上いるグループだけ切り替える
+            if (group.Count >= 2)
+            {
+                Coroutine coroutine =
+                    StartCoroutine(CycleHintGroup(group));
+
+                hintCoroutines.Add(coroutine);
+            }
+        }
+    }
+
+
+    // 同じ範囲にいる小人のヒントを切り替える
+    IEnumerator CycleHintGroup(
+        List<HintFrameInfo> group)
+    {
+        int index = 0;
+
+        while (true)
+        {
+            List<HintFrameInfo> activeFrames =
+                new List<HintFrameInfo>();
+
+            // 発見済みではない小人だけを取得
+            foreach (HintFrameInfo info in group)
+            {
+                if (info.dwarf != null &&
+                    !info.dwarf.isFound &&
+                    info.frame != null)
+                {
+                    activeFrames.Add(info);
+                }
+            }
+
+            // 表示対象がなくなった
+            if (activeFrames.Count == 0)
+                yield break;
+
+            // 残り1人なら、そのヒントを表示したまま終了
+            if (activeFrames.Count == 1)
+            {
+                activeFrames[0].frame.SetActive(true);
+                yield break;
+            }
+
+            // いったん全員のヒントを非表示
+            foreach (HintFrameInfo info in activeFrames)
+            {
+                info.frame.SetActive(false);
+            }
+
+            // 今回表示する小人
+            if (index >= activeFrames.Count)
+                index = 0;
+
+            activeFrames[index].frame.SetActive(true);
+
+            Debug.Log(
+                "ヒント表示切り替え : "
+                + activeFrames[index].dwarf.name
+            );
+
+            index++;
+
+            // 指定時間待つ
+            yield return new WaitForSeconds(
+                hintSwitchInterval
+            );
+        }
+    }
+
     void ClearHintFrames()
     {
+        // 実行中の切り替え処理を停止
+        foreach (Coroutine coroutine in hintCoroutines)
+        {
+            if (coroutine != null)
+            {
+                StopCoroutine(coroutine);
+            }
+        }
+
+        hintCoroutines.Clear();
+
+        // ヒント枠を削除
         foreach (GameObject frame in currentHintFrames)
         {
             if (frame != null)
@@ -374,8 +591,13 @@ public class HintManager : MonoBehaviour
 
         currentHintFrames.Clear();
 
+        // 管理情報も初期化
+        hintFrameInfos.Clear();
+        dwarfFrames.Clear();
+
         Debug.Log("前回のヒント枠をすべて削除しました");
     }
+
 
     // 小人が発見されたときに呼ぶ
     public void RemoveHintFrame(Dwarf dwarf)
@@ -394,9 +616,16 @@ public class HintManager : MonoBehaviour
 
             dwarfFrames.Remove(dwarf);
 
+            currentHintFrames.Remove(frame);
+
             Debug.Log(
                 "発見された小人のヒント枠を削除しました"
             );
         }
+
+        // 切り替え対象からも削除
+        hintFrameInfos.RemoveAll(
+            info => info.dwarf == dwarf
+        );
     }
 }
