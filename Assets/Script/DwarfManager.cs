@@ -91,11 +91,7 @@ public class DwarfManager : MonoBehaviour
             return false;
         }
 
-        // ”š’e‚ª‚ ‚éƒpƒlƒ‹‚É‚ÍˆÚ“®‚Å‚«‚È‚¢
-        if (panel.hasBomb)
-        {
-            return false;
-        }
+        // ”š’e‚ª‚ ‚Á‚Ä‚àˆÚ“®‚Å‚«‚é
 
         return true;
     }

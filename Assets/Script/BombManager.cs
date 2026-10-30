@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BombManager : MonoBehaviour
@@ -16,55 +17,54 @@ public class BombManager : MonoBehaviour
     }
 
     // 最初から爆弾を配置
-
     public void SpawnBomb()
     {
         Panel[,] panels = gridManager.GetPanels();
 
-        while (true)
+        List<Panel> candidates = new List<Panel>();
+
+        // 配置可能なパネルを取得
+        for (int x = 0; x < gridManager.Width; x++)
         {
-            int x = Random.Range(0, gridManager.Width);
-            int y = Random.Range(0, gridManager.Height);
+            for (int y = 0; y < gridManager.Height; y++)
+            {
+                Panel panel = panels[x, y];
 
-            Panel panel = panels[x, y];
+                if (panel != null && !panel.IsBroken())
+                {
+                    candidates.Add(panel);
+                }
+            }
+        }
 
-            if (panel == null)
-                continue;
-
-            // 小人がいる場所には置かない
-            if (panel.dwarf != null)
-                continue;
-
-            // すでに爆弾がある場所には置かない
-            if (panel.hasBomb)
-                continue;
-
-            // 最初から配置する爆弾
-            Bomb bomb = Instantiate(bombPrefab);
-
-            // false → 見えない
-            bomb.SetPanel(panel, false);
-
-            Debug.Log($"爆弾配置 ({x},{y})");
-
+        if (candidates.Count == 0)
+        {
+            Debug.LogError("爆弾を配置できるパネルがありません");
             return;
         }
+
+        Panel selected =
+            candidates[Random.Range(0, candidates.Count)];
+
+        Bomb bomb = Instantiate(bombPrefab);
+
+        bomb.SetPanel(selected, false);
+
+        Debug.Log($"爆弾配置 ({selected.x},{selected.y})");
     }
 
     // 指定したパネルに爆弾を置く
-
     public void PlaceBomb(Panel panel)
     {
         if (panel == null)
             return;
 
-        if (panel.hasBomb)
+        if (panel.IsBroken())
             return;
 
-        // 爆弾を生成
+        // 爆弾があっても小人がいても設置可能
         Bomb bomb = Instantiate(bombPrefab);
 
-        // true → 見える
         bomb.SetPanel(panel, true);
 
         Debug.Log(
@@ -73,17 +73,19 @@ public class BombManager : MonoBehaviour
     }
 
     // 爆発
-
     public void Explode(Panel center)
     {
         Debug.Log(
-        $"爆発開始！ 中心 ({center.x},{center.y})"
+            $"爆発開始！ 中心 ({center.x},{center.y})"
         );
 
-        // 中心パネルにある爆弾を爆発させる
-        if (center.bomb != null)
+        // 中心パネルにあるすべての爆弾を処理
+        foreach (Bomb bomb in center.bombs.ToArray())
         {
-            center.bomb.Explode();
+            if (bomb != null)
+            {
+                bomb.Explode();
+            }
         }
 
         Panel[,] panels = gridManager.GetPanels();
@@ -96,7 +98,6 @@ public class BombManager : MonoBehaviour
                 int nx = center.x + dx;
                 int ny = center.y + dy;
 
-                // 盤面外
                 if (nx < 0 || nx >= gridManager.Width)
                     continue;
 
@@ -108,15 +109,11 @@ public class BombManager : MonoBehaviour
                 if (panel == null)
                     continue;
 
-                // すでに壊れている場合
                 if (panel.IsBroken())
                     continue;
 
-                Debug.Log(
-                    $"爆発で破壊 ({nx},{ny})"
-                );
+                Debug.Log($"爆発で破壊 ({nx},{ny})");
 
-                // 爆発による破壊なのでターンを減らさない
                 panel.BreakPanel(false);
             }
         }

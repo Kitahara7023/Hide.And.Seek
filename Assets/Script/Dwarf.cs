@@ -40,7 +40,7 @@ public class Dwarf : MonoBehaviour
         // 新しいパネルに小人を登録
         currentPanel.dwarf = this;
 
-        // 小人の位置をパネルの位置に合わせる
+        // 通常時はパネル中央
         transform.position = panel.transform.position;
     }
 
@@ -77,5 +77,16 @@ public class Dwarf : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(transform.position, 0.1f);
+    }
+
+    // 爆発したときだけ小人の位置をずらす
+    public void MoveAside()
+    {
+        if (currentPanel == null)
+            return;
+
+        transform.position =
+            currentPanel.transform.position +
+            new Vector3(-0.22f, 0f, 0f);
     }
 }
