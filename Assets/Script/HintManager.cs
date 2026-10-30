@@ -184,7 +184,11 @@ public class HintManager : MonoBehaviour
             if (usedHintCount == 0)
                 return 9;
 
-            return 7;
+            if (usedHintCount == 1)
+                return 7;
+
+            if (usedHintCount == 2)
+                return 5;
         }
 
         if (gridManager.Width == 13)
@@ -192,7 +196,11 @@ public class HintManager : MonoBehaviour
             if (usedHintCount == 0)
                 return 9;
 
-            return 7;
+            if (usedHintCount == 1)
+                return 7;
+
+            if (usedHintCount == 2)
+                return 5;
         }
 
         return 5;
