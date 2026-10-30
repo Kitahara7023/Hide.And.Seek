@@ -2014,8 +2014,9 @@ MonoBehaviour:
   - {r: 0.2941177, g: 0, b: 0.509804, a: 1}
   - {r: 0.7294118, g: 0.3333333, b: 0.8274511, a: 1}
   - {r: 1, g: 0, b: 1, a: 1}
-  hintInterval: 4
+  hintInterval: 2
   maxHintCount: 99
+  hintSwitchInterval: 2
 --- !u!4 &909471577
 Transform:
   m_ObjectHideFlags: 0
