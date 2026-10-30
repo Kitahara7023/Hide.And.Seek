@@ -82,32 +82,30 @@ public class GameManager : MonoBehaviour
     }
 
     // パネルを割った時に呼ぶ    ターンを1消費する
-    public void UseTurn()
+    // allowAfterClearは、最後のターンで小人を発見した場合に使用する
+    public void UseTurn(bool allowAfterClear = false)
     {
-        // クリアまたはゲームオーバー後は何もしない
-        if (isGameClear || isGameOver)
+        // ゲームオーバー後は何もしない
+        if (isGameOver)
             return;
 
-        // ターンを1減らす
+        // クリア後の通常操作は受け付けない
+        if (isGameClear && !allowAfterClear)
+            return;
+
         currentTurn--;
 
-        // 0未満にならないようにする
         if (currentTurn < 0)
-        {
             currentTurn = 0;
-        }
 
-        // UI更新
         UIManager.Instance.UpdateTurn(currentTurn);
 
         Debug.Log("残りターン : " + currentTurn);
 
-        // ターンが0以下になったらゲームオーバー
         if (currentTurn <= 0)
         {
             currentTurn = 0;
 
-            // UI上も0にする
             UIManager.Instance.UpdateTurn(currentTurn);
 
             GameOver();

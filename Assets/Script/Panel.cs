@@ -107,15 +107,11 @@ public class Panel : MonoBehaviour
 
         Debug.Log($"Break ({x},{y})");
 
-        // 通常クリックの場合だけターンを消費
-        if (useTurn)
-        {
-            if (GameManager.Instance != null)
-                GameManager.Instance.UseTurn();
-        }
+        // このパネルに小人がいるか確認
+        bool hasDwarf = dwarf != null;
 
         // 小人がいる場合
-        if (dwarf != null)
+        if (hasDwarf)
         {
             Debug.Log($"小人発見！ Panel ({x},{y})");
 
@@ -131,14 +127,28 @@ public class Panel : MonoBehaviour
             if (dwarfRenderer != null)
                 dwarfRenderer.sortingOrder = 1;
 
+            // 小人を発見
             dwarf.Found();
         }
 
-        // 爆弾がある場合
+        // 爆弾がある場合は先に爆発させる
         if (bombs.Count > 0)
         {
             Debug.Log($"爆弾発見！ Panel ({x},{y})");
+
             BombManager.Instance.Explode(this);
+        }
+
+        // 爆発範囲の小人の発見処理が終わってからターンを消費
+        if (useTurn)
+        {
+            if (GameManager.Instance != null)
+            {
+                bool clearByExplosion =
+                    GameManager.Instance.isGameClear;
+
+                GameManager.Instance.UseTurn(clearByExplosion);
+            }
         }
 
         if (spriteRenderer != null)
