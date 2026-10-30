@@ -72,6 +72,26 @@ public class Dwarf : MonoBehaviour
         }
     }
 
+    public void UpdatePositionOnPanel()
+    {
+        if (currentPanel == null)
+            return;
+
+        if (currentPanel.hasBomb)
+        {
+            // 爆弾から少し顔を出す
+            transform.position =
+                currentPanel.transform.position +
+                new Vector3(-0.22f, 0f, 0f);
+        }
+        else
+        {
+            // 爆弾がなければ中央に戻る
+            transform.position =
+                currentPanel.transform.position;
+        }
+    }
+
     // Sceneビューで小人の位置を確認する
     private void OnDrawGizmos()
     {

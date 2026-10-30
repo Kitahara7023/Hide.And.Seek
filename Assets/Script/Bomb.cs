@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class Bomb : MonoBehaviour
 {
+    [Header("現在いるパネル")]
     public Panel currentPanel;
 
+    // trueなら隠された爆弾
     private bool isHiddenBomb;
 
     private SpriteRenderer spriteRenderer;
@@ -13,12 +15,15 @@ public class Bomb : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
+    // 爆弾をパネルに配置する
+    // visibleがfalseなら隠された爆弾
+    // visibleがtrueなら最初から見える爆弾
     public void SetPanel(Panel panel, bool visible = false)
     {
         if (panel == null)
             return;
 
-        // 前のパネルから登録解除
+        // 以前のパネルから登録を解除
         if (currentPanel != null)
         {
             currentPanel.RemoveBomb(this);
@@ -26,38 +31,19 @@ public class Bomb : MonoBehaviour
 
         currentPanel = panel;
 
-        // 新しいパネルに登録
-        panel.AddBomb(this);
-
         isHiddenBomb = !visible;
 
-        if (spriteRenderer == null)
+        // 新しいパネルに爆弾を登録
+        currentPanel.AddBomb(this);
+
+        if (spriteRenderer != null)
         {
-            spriteRenderer = GetComponent<SpriteRenderer>();
+            spriteRenderer.enabled = visible;
         }
-
-        if (spriteRenderer == null)
-        {
-            Debug.LogError("BombにSpriteRendererがありません！");
-            return;
-        }
-
-        spriteRenderer.enabled = visible;
-
-        if (visible)
-        {
-            spriteRenderer.sortingOrder = 10;
-        }
-
-        Debug.Log(
-            visible ? "設置した爆弾を表示" : "隠し爆弾を非表示"
-        );
     }
 
-    // Panelから呼び出して表示位置を変更
-    public void SetVisualPosition(
-    Vector3 position,
-    int index)
+    // パネル上で爆弾の表示位置を更新
+    public void SetVisualPosition(Vector3 position, int index)
     {
         transform.position = position;
 
@@ -79,6 +65,8 @@ public class Bomb : MonoBehaviour
         {
             spriteRenderer.enabled = true;
             spriteRenderer.sortingOrder = 10;
+
+            isHiddenBomb = false;
 
             Debug.Log("隠されていた爆弾が姿を現した！");
         }

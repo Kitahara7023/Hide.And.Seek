@@ -36,13 +36,16 @@ public class Panel : MonoBehaviour
             return;
 
         if (!bombs.Contains(bomb))
-        {
             bombs.Add(bomb);
-        }
 
         hasBomb = bombs.Count > 0;
 
-        // 登録した爆弾の位置を更新
+        // 爆弾が置かれたら小人の位置を更新
+        if (dwarf != null)
+        {
+            dwarf.UpdatePositionOnPanel();
+        }
+
         UpdateBombPositions();
     }
 
@@ -55,6 +58,12 @@ public class Panel : MonoBehaviour
         bombs.Remove(bomb);
 
         hasBomb = bombs.Count > 0;
+
+        // 爆弾がなくなった場合、小人の位置も更新
+        if (dwarf != null)
+        {
+            dwarf.UpdatePositionOnPanel();
+        }
 
         UpdateBombPositions();
     }
