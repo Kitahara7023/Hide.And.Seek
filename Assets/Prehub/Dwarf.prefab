@@ -82,7 +82,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 8056063132577222124, guid: 6081aeea8c27c7d45ae92695d12518c7, type: 3}
+  m_Sprite: {fileID: 5599428480715911220, guid: 62c738e2a3cdd7048b1bf7478a61c0b8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -106,3 +106,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Dwarf
   dwarfType: 0
   currentPanel: {fileID: 0}
+  isFound: 0
