@@ -2252,6 +2252,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   startTurn: 15
   currentTurn: 0
+  gridManager: {fileID: 1243323302}
   bombButton: {fileID: 1357621539}
   hintButton: {fileID: 823152417}
   isGameClear: 0
