@@ -49,7 +49,6 @@ public class GridManager : MonoBehaviour
         }
     }
 
-
     void Start()
     {
         // ゲーム設定を読み込む
@@ -63,7 +62,6 @@ public class GridManager : MonoBehaviour
             // 爆弾の数
             bombCount = GameSettings.Instance.bombCount;
 
-            Debug.Log("========== GridManager設定 ==========");
             Debug.Log(
                 "パネルサイズ : " +
                 width +
@@ -76,7 +74,6 @@ public class GridManager : MonoBehaviour
                 bombCount
             );
 
-            Debug.Log("====================================");
         }
         else
         {

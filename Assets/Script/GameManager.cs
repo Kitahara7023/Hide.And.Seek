@@ -155,9 +155,7 @@ public class GameManager : MonoBehaviour
         // 爆弾設置ボタンとヒントボタンを非表示
         HideActionButtons();
 
-        Debug.Log("================================");
         Debug.Log("GAME CLEAR");
-        Debug.Log("================================");
 
         // クリアUIを表示
         UIManager.Instance.ShowClear();
@@ -176,9 +174,7 @@ public class GameManager : MonoBehaviour
         // 爆弾設置ボタンとヒントボタンを非表示
         HideActionButtons();
 
-        Debug.Log("================================");
         Debug.Log("GAME OVER");
-        Debug.Log("================================");
 
         // 小人の隠れていた場所を公開
         if (gridManager != null)
@@ -187,7 +183,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("GridManagerが設定されていません！");
+            Debug.LogError("GridManagerが設定されていません");
         }
 
         // ゲームオーバーUIを表示
