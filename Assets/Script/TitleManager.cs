@@ -142,8 +142,7 @@ public class TitleManager : MonoBehaviour
         }
 
         // Consoleに設定内容を表示
-        Debug.Log("========== ゲーム設定 ==========");
-
+        
         Debug.Log(
             "パネルサイズ : " +
             GameSettings.Instance.panelWidth +
@@ -172,8 +171,6 @@ public class TitleManager : MonoBehaviour
                 ? "ON"
                 : "OFF")
         );
-
-        Debug.Log("================================");
 
         // GameSceneへ移動
         SceneManager.LoadScene(gameSceneName);

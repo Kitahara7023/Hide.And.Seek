@@ -50,7 +50,6 @@ public class HintManager : MonoBehaviour
     private List<Coroutine> hintCoroutines =
         new List<Coroutine>();
 
-
     void Update()
     {
         UpdateHintButton();
